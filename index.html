@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- See http://www.firepad.io/docs/ for detailed embedding docs. -->
 <html>
+
 <head>
   <meta charset="utf-8" />
   <!-- Firebase -->
@@ -15,14 +15,56 @@
   <script src="https://firepad.io/releases/v1.5.9/firepad.min.js"></script>
 
   <style>
-    html { height: 100%; }
-    body { margin: 0; height: 100%; position: relative; }
-    /* Height / width / positioning can be customized for your use case.
-       For demo purposes, we make firepad fill the entire browser. */
-    #firepad-container {
-      width: 100%;
+    html,
+    .container,
+    #console-output,
+    .cm-s-default {
       height: 100%;
     }
+
+    body {
+      margin: 0;
+      height: calc(100% - 40px);
+      position: relative;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    #editor-container {
+      width: 50%;
+      height: 100%;
+    }
+
+    #control-toolbar {
+      background-color: #00a3e0;
+      width: 100%;
+      height: 40px;
+      text-align: center;
+    }
+
+    #console-output {
+      width: 50%;
+      background-color: #c9c9c9;
+    }
+
+    #console-output div {
+      border: 1px solid #cccccc;
+      padding: 4px 16px;
+    }
+
+    #run {
+      background: #090;
+      border: 0;
+      padding: 4px;
+      margin: 5px;
+      color: #fff;
+      font-size: 16px;
+      min-width: 70px;
+    }
+
     .powered-by-firepad {
       display: none;
     }
@@ -30,49 +72,76 @@
 </head>
 
 <body onload="init()">
-  <div id="firepad-container"></div>
-
+  <div class="container">
+    <div id="control-toolbar"><button id="run">Run</button></div>
+    <div id="editor-container"></div>
+    <div id="console-output"></div>
+  </div>
   <script>
-    function init() {
+
+    (function () {
+
+      /// DOM Elements.
+      const consoleOutput = document.getElementById('console-output');
+      const editor = document.getElementById('editor-container');
+      const runBtn = document.getElementById('run');
+
+      /// Console
+      console.stdlog = console.log.bind(console);
+      console.logs = [];
+      console.log = function () {
+        console.logs.push(Array.from(arguments));
+        console.stdlog.apply(console, arguments);
+      }
+
       //// Initialize Firebase.
-      //// TODO: replace with your Firebase project configuration.
-      var config = {
+      const config = {
         apiKey: '<API_KEY>',
         authDomain: "firepad-gh-tests.firebaseapp.com",
         databaseURL: "https://firepad-gh-tests.firebaseio.com"
       };
-      firebase.initializeApp(config);
 
-      //// Get Firebase Database reference.
-      var firepadRef = getExampleRef();
+      firebase.initializeApp(config);
+      const firepadRef = getExampleRef();
 
       //// Create CodeMirror (with line numbers and the JavaScript mode).
-      var codeMirror = CodeMirror(document.getElementById('firepad-container'), {
+      const codeMirror = CodeMirror(editor, {
         lineNumbers: true,
         mode: 'javascript'
       });
 
       //// Create Firepad.
-      var firepad = Firepad.fromCodeMirror(firepadRef, codeMirror, {
-        defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  var message = "Hello, world.";\n  console.log(message);\n}'
+      const firepad = Firepad.fromCodeMirror(codeMirror, {
+        defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  const message = "Hello, world.";\n  console.log(message);\n}'
       });
-    }
 
-    // Helper to get hash from end of URL or generate a random one.
-    function getExampleRef() {
-      var ref = firebase.database().ref();
-      var hash = window.location.hash.replace(/#/g, '');
-      if (hash) {
-        ref = ref.child(hash);
-      } else {
-        ref = ref.push(); // generate unique location.
-        window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+      //// Helper to get hash from end of URL or generate a random one.
+      function getExampleRef() {
+        const ref = firebase.database().ref();
+        const hash = window.location.hash.replace(/#/g, '');
+        if (hash) {
+          ref = ref.child(hash);
+        } else {
+          ref = ref.push(); // generate unique location.
+          window.location = window.location + '#' + ref.key; // add it as a hash to the URL.
+        }
+        return ref;
       }
-      if (typeof console !== 'undefined') {
-        console.log('Firebase data: ', ref.toString());
-      }
-      return ref;
-    }
+
+      //// Event listeners
+      runBtn.addEventListener('click', function (e) {
+        console.logs.length = 0;
+        eval(codeMirror.getValue());
+
+        consoleOutput.innerHTML = '';
+        console.logs.forEach((message) => {
+          const line = document.createElement('div');
+          line.innerHTML = message.join(', ');
+          consoleOutput.appendChild(line);
+        });
+      });
+    })();
   </script>
 </body>
+
 </html>
