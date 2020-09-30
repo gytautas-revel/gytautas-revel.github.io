@@ -110,11 +110,6 @@
         mode: 'javascript'
       });
 
-      //// Create Firepad.
-      const firepad = Firepad.fromCodeMirror(codeMirror, {
-        defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  const message = "Hello, world.";\n  console.log(message);\n}'
-      });
-
       //// Helper to get hash from end of URL or generate a random one.
       function getExampleRef() {
         let ref = firebase.database().ref();
@@ -128,29 +123,31 @@
         return ref;
       }
 
-      function output() {
 
-      }
-
-      
       //// Event listeners
       runBtn.addEventListener('click', function (e) {
         console.logs.length = 0;
         consoleOutput.innerHTML = '';
-
         try {
           eval(codeMirror.getValue());
         } catch (e) {
           console.log(e);
         }
-        
+
         console.logs.forEach((message) => {
           const line = document.createElement('div');
           line.innerHTML = message.join(', ');
           consoleOutput.appendChild(line);
         });
- 
+
       });
+
+
+      //// Create Firepad.
+      const firepad = Firepad.fromCodeMirror(codeMirror, {
+        defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  const message = "Hello, world.";\n  console.log(message);\n}'
+      });
+
     })();
   </script>
 </body>
