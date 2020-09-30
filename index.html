@@ -117,7 +117,7 @@
 
       //// Helper to get hash from end of URL or generate a random one.
       function getExampleRef() {
-        const ref = firebase.database().ref();
+        let ref = firebase.database().ref();
         const hash = window.location.hash.replace(/#/g, '');
         if (hash) {
           ref = ref.child(hash);
