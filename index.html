@@ -71,7 +71,7 @@
   </style>
 </head>
 
-<body>
+<body onload="init()">
   <div class="container">
     <div id="control-toolbar"><button id="run">Run</button></div>
     <div id="editor-container"></div>
@@ -79,7 +79,7 @@
   </div>
   <script>
 
-    (function () {
+    function init() {
 
       /// DOM Elements.
       const consoleOutput = document.getElementById('console-output');
@@ -148,7 +148,7 @@
         defaultText: '// JavaScript Editing with Firepad!\nfunction go() {\n  const message = "Hello, world.";\n  console.log(message);\n}'
       });
 
-    })();
+    };
   </script>
 </body>
 
