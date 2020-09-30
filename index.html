@@ -71,7 +71,7 @@
   </style>
 </head>
 
-<body >
+<body>
   <div class="container">
     <div id="control-toolbar"><button id="run">Run</button></div>
     <div id="editor-container"></div>
@@ -102,7 +102,7 @@
       };
 
       firebase.initializeApp(config);
-      const firepadRef = getExampleRef();
+      let firepadRef = getExampleRef();
 
       //// Create CodeMirror (with line numbers and the JavaScript mode).
       const codeMirror = CodeMirror(editor, {
@@ -128,17 +128,28 @@
         return ref;
       }
 
+      function output() {
+
+      }
+
+      
       //// Event listeners
       runBtn.addEventListener('click', function (e) {
         console.logs.length = 0;
-        eval(codeMirror.getValue());
-
         consoleOutput.innerHTML = '';
+
+        try {
+          eval(codeMirror.getValue());
+        } catch (e) {
+          console.log(e);
+        }
+        
         console.logs.forEach((message) => {
           const line = document.createElement('div');
           line.innerHTML = message.join(', ');
           consoleOutput.appendChild(line);
         });
+ 
       });
     })();
   </script>
